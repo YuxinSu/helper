@@ -123,4 +123,8 @@ public @interface Plugin {
     @Nonnull
     String[] loadBefore() default {};
 
+
+    @Nonnull
+    String apiVersion() default "";
+
 }

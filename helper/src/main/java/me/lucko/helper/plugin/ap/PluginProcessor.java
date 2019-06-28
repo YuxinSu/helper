@@ -90,6 +90,11 @@ public class PluginProcessor extends AbstractProcessor {
             data.put("version", new SimpleDateFormat("yyyy-MM-dd-HH-mm").format(new Date(System.currentTimeMillis())));
         }
 
+        String apiVersion = annotation.apiVersion();
+        if(!apiVersion.isEmpty()) {
+            data.put("api-version", apiVersion);
+        }
+
         data.put("main", type.getQualifiedName().toString());
 
         String description = annotation.description();

@@ -55,19 +55,8 @@
         <source.version>3.0.1</source.version>
         <javadoc.version>2.10.4</javadoc.version>
 
-        <bukkit.version>1.12.2-R0.1-SNAPSHOT</bukkit.version>
+        <bukkit.version>1.13.2-R0.1-SNAPSHOT</bukkit.version>
     </properties>
-
-    <distributionManagement>
-        <snapshotRepository>
-            <id>luck-snapshots</id>
-            <url>https://nexus.lucko.me/repository/maven-snapshots/</url>
-        </snapshotRepository>
-        <repository>
-            <id>luck-releases</id>
-            <url>https://nexus.lucko.me/repository/maven-releases/</url>
-        </repository>
-    </distributionManagement>
 
     <ciManagement>
         <system>Jenkins</system>
@@ -134,5 +123,12 @@
             <url>https://repo.spongepowered.org/maven</url>
         </repository>
     </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>jcenter</id>
+            <url>https://jcenter.bintray.com</url>
+        </pluginRepository>
+    </pluginRepositories>
 
 </project>
