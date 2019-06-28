@@ -38,8 +38,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public final class BukkitTypeSerializer implements TypeSerializer<ConfigurationSerializable> {
-    private static final TypeToken<Map<String, Object>> TYPE = new TypeToken<Map<String, Object>>(){};
-
     public static final BukkitTypeSerializer INSTANCE = new BukkitTypeSerializer();
 
     private BukkitTypeSerializer() {
@@ -47,7 +45,7 @@ public final class BukkitTypeSerializer implements TypeSerializer<ConfigurationS
 
     @Override
     public ConfigurationSerializable deserialize(TypeToken<?> type, ConfigurationNode from) throws ObjectMappingException {
-        Map<String, Object> map = from.getValue(TYPE);
+        Map<String, Object> map = (Map<String, Object>) from.getValue();
         deserializeChildren(map);
         return ConfigurationSerialization.deserializeObject(map);
     }
