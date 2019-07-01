@@ -34,8 +34,7 @@ import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 public final class BukkitTypeSerializer implements TypeSerializer<ConfigurationSerializable> {
     public static final BukkitTypeSerializer INSTANCE = new BukkitTypeSerializer();
@@ -52,13 +51,69 @@ public final class BukkitTypeSerializer implements TypeSerializer<ConfigurationS
 
     @Override
     public void serialize(TypeToken<?> type, ConfigurationSerializable from, ConfigurationNode to) throws ObjectMappingException {
-        Map<String, Object> serialized = from.serialize();
+        to.setValue(serializableToMap(from));
+    }
+
+    private List<Object> serializeChildren(List<Object> collection) {
+        ListIterator<Object> iterator = collection.listIterator();
+        while(iterator.hasNext()) {
+            Object entry = iterator.next();
+            if(entry instanceof Map) {
+                try {
+                    //noinspection unchecked
+                    Map<String, Object> value = (Map<String, Object>) entry;
+                    iterator.set(serializeChildren(value));
+                } catch (Exception ignore) {
+                }
+            } else if(entry instanceof List) {
+                try {
+                    //noinspection unchecked
+                    List<Object> value = (List<Object>) entry;
+                    iterator.set(serializeChildren(value));
+                } catch (Exception ignore) {
+                }
+            } else if(entry instanceof ConfigurationSerializable) {
+                ConfigurationSerializable value = (ConfigurationSerializable) entry;
+                iterator.set(serializeChildren(serializableToMap(value)));
+            }
+        }
+
+        return collection;
+    }
+
+    private Map<String, Object> serializeChildren(Map<String, Object> map) {
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            if(entry.getValue() instanceof Map) {
+                try {
+                    //noinspection unchecked
+                    Map<String, Object> value = (Map<String, Object>) entry.getValue();
+                    entry.setValue(serializeChildren(value));
+                } catch (Exception ignore) {
+                }
+            } else if(entry.getValue() instanceof List) {
+                try {
+                    //noinspection unchecked
+                    List<Object> value = (List<Object>) entry.getValue();
+                    entry.setValue(serializeChildren(value));
+                } catch (Exception ignore) {
+                }
+            } else if(entry.getValue() instanceof ConfigurationSerializable) {
+                ConfigurationSerializable value = (ConfigurationSerializable) entry.getValue();
+                entry.setValue(serializeChildren(serializableToMap(value)));
+            }
+        }
+
+        return map;
+    }
+
+    private Map<String, Object> serializableToMap(ConfigurationSerializable from) {
+        Map<String, Object> serialized = serializeChildren(from.serialize());
 
         Map<String, Object> map = new LinkedHashMap<>(serialized.size() + 1);
         map.put(ConfigurationSerialization.SERIALIZED_TYPE_KEY, ConfigurationSerialization.getAlias(from.getClass()));
         map.putAll(serialized);
 
-        to.setValue(map);
+        return map;
     }
 
     private static void deserializeChildren(Map<String, Object> map) {
